@@ -1,0 +1,27 @@
+﻿@inherits FluentInputBase<bool>
+
+<FluentCheckbox Value="@Value" ValueChanged="OnValueChanged" ValueExpression="For" Label="@Label" style="width: 100%;" />
+
+@code {
+    [Parameter] public Expression<Func<bool>> For { get; set; }
+    
+    protected override bool TryParseValueFromString(string value, out bool result, out string validationErrorMessage)
+    {
+        if (bool.TryParse(value, out result))
+        {
+            validationErrorMessage = null;
+            return true;
+        }
+        else
+        {
+            validationErrorMessage = "Invalid input. Please enter a valid boolean value.";
+            return false;
+        }
+    }
+
+    private void OnValueChanged(bool value)
+    {
+        Value = value;
+        ValueChanged.InvokeAsync(Value);
+    }
+}

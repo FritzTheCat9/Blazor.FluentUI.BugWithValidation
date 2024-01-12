@@ -7,5 +7,7 @@
         public string Name { get; set; }
         public DateTime? Date { get; set; }
         public MyDictionaryItemDto MyDictionaryItem { get; set; }
+        public bool Checked { get; set; }
+        public int Number { get; set; }
     }
 }

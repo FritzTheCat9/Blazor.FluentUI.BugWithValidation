@@ -9,6 +9,8 @@ namespace Blazor.FluentUI.BugWithValidation.Commands
             public string Name { get; set; }
             public DateTime? Date { get; set; }
             public int? MyDictionaryItemId { get; set; }
+            public bool Checked { get; set; }
+            public int Number { get; set; }
         }
 
         public class Validator : AbstractValidator<Command>
@@ -22,6 +24,12 @@ namespace Blazor.FluentUI.BugWithValidation.Commands
                     .NotEmpty();
 
                 RuleFor(x => x.MyDictionaryItemId)
+                    .NotEmpty();
+
+                RuleFor(x => x.Checked)
+                    .NotEmpty();
+
+                RuleFor(x => x.Number)
                     .NotEmpty();
             }
         }

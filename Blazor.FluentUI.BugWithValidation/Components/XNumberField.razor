@@ -1,0 +1,31 @@
+﻿@inherits FluentInputBase<int>
+
+<FluentNumberField ParsingErrorMessage="@ParsingErrorMessage" TValue="int" Value="@Value" ValueChanged="OnValueChanged" ValueExpression="For" Label="@Label" style="width: 100%;" />
+
+@code {
+    [Parameter] public Expression<Func<int>> For { get; set; }
+
+    private string ParsingErrorMessage = "Invalid input. Please enter a valid int value.";
+
+    protected override bool TryParseValueFromString(string value, out int result, out string validationErrorMessage)
+    {
+        if (int.TryParse(value, out result))
+        {
+            validationErrorMessage = null;
+            return true;
+        }
+        else
+        {
+            validationErrorMessage = ParsingErrorMessage;
+            return false;
+        }
+    }
+
+    private void OnValueChanged(int value)
+    {
+        Value = value;
+        ValueChanged.InvokeAsync(Value);
+
+        EditContext.NotifyFieldChanged(FieldIdentifier);
+    }
+}
