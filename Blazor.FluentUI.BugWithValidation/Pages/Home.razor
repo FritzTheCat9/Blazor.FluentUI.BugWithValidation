@@ -1,0 +1,64 @@
+﻿@page "/"
+
+<PageTitle>Home</PageTitle>
+
+<EditForm Model="Command" OnValidSubmit="HandleValidSubmit">
+    @* <CustomValidator @ref="CustomValidator" /> *@
+    <FluentValidationValidator />
+
+    <XTextField @bind-Value="Command.Name" For="(() => Command.Name)" Label="Name" />
+    <FluentValidationMessage For="(() => Command.Name)" />
+
+    <XDatePicker @bind-Value="Command.Date" For="(() => Command.Date)" Label="Date" />
+    <FluentValidationMessage For="(() => Command.Date)" />
+
+    <XDictionaryItemPicker @bind-Value="Command.MyDictionaryItemId" Label="MyDictionaryItem" Placeholder="Select MyDictionaryItem" />
+    <FluentValidationMessage For="(() => Command.MyDictionaryItemId)" />
+
+
+    <FluentButton Type="ButtonType.Submit" Color="Fluent.Color.Info">Add event</FluentButton>
+</EditForm>
+
+<FluentLabel>Events list:</FluentLabel>
+
+<FluentDataGrid Items="Events">
+    <PropertyColumn Property="@(e => e.Id)" />
+    <PropertyColumn Property="@(e => e.Name)" />
+    <PropertyColumn Property="@(e => e.Date)" Format="yyyy-MM-dd" />
+    <PropertyColumn Property="@(e => e.MyDictionaryItem.Name)" />
+</FluentDataGrid>
+
+@code {
+    public CreateEvent.Command Command { get; set; } = new();
+    public IQueryable<EventDto> Events { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var list = new List<EventDto>()
+        {
+            new EventDto { Id = 1, Name = "Event 1", Date = DateTime.UtcNow, MyDictionaryItem = new MyDictionaryItemDto { Id = 1, Code = "ITEM_CODE_1", Name = "ITEM_NAME_1" } },
+            new EventDto { Id = 2, Name = "Event 2", Date = DateTime.UtcNow, MyDictionaryItem = new MyDictionaryItemDto { Id = 2, Code = "ITEM_CODE_2", Name = "ITEM_NAME_2" } },
+            new EventDto { Id = 3, Name = "Event 3", Date = DateTime.UtcNow, MyDictionaryItem = new MyDictionaryItemDto { Id = 3, Code = "ITEM_CODE_3", Name = "ITEM_NAME_3" } },
+        };
+
+        Events = list.AsQueryable();
+    }
+
+    private int GenerateNextEventId()
+    {
+        var newEventId = Events.ToList().Max(x => x.Id) + 1;
+        return newEventId;
+    }
+
+    private void HandleValidSubmit()
+    {
+        var events = Events.ToList();
+
+        var pickedDictionaryItem = MyDictionaryItemDtoFakeDatabase.GetAll()
+            .FirstOrDefault(x => x.Id == Command.MyDictionaryItemId);
+
+        events.Add(new EventDto { Id = GenerateNextEventId(), Name = Command.Name, Date = Command.Date, MyDictionaryItem = pickedDictionaryItem });
+
+        Events = events.AsQueryable();
+    }
+}

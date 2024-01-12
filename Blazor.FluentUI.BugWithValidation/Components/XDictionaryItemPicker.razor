@@ -1,0 +1,65 @@
+﻿@inherits InputBase<int?>
+
+<FluentAutocomplete SelectedOptions="DictionaryItems" Label="@Label" Placeholder="@Placeholder" style="width: 100%;"
+                    TOption="MyDictionaryItemDto" OnOptionsSearch="SearchMyDictionaryItems" SelectedOptionsChanged="SelectedOptionsChanged"
+                    OptionText="(item => item.Name)" MaximumSelectedOptions="1" AutoComplete="@Autocomplete" MaximumOptionsSearch="30">
+    <SelectedOptionTemplate Context="item">
+        <FluentLabel>
+            @item.Name
+        </FluentLabel>
+    </SelectedOptionTemplate>
+    <FooterContent Context="item">
+        @if (!item.Any())
+        {
+            <FluentLabel Style="font-size: 11px; text-align: center; width: 200px;">
+                No items found in dictionary
+            </FluentLabel>
+        }
+    </FooterContent>
+</FluentAutocomplete>
+
+@code {
+    [Parameter] public string Label { get; set; }
+    [Parameter] public string Placeholder { get; set; }
+    [Parameter] public MyDictionaryItemDto DictionaryItem { get; set; }
+    [Parameter] public string Autocomplete { get; set; } = "off";
+
+    private IEnumerable<MyDictionaryItemDto> DictionaryItems { get; set; } = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (DictionaryItem is not null)
+        {
+            DictionaryItems = new List<MyDictionaryItemDto>() { DictionaryItem };
+
+            Value = DictionaryItems.FirstOrDefault()?.Id;
+            await ValueChanged.InvokeAsync(Value);
+
+            EditContext.NotifyFieldChanged(FieldIdentifier);
+        }
+    }
+
+    protected override bool TryParseValueFromString(string value, out int? result, out string validationErrorMessage)
+    {
+        result = DictionaryItems.FirstOrDefault()?.Id;
+        validationErrorMessage = null;
+        return true;
+    }
+
+    public async void SelectedOptionsChanged(IEnumerable<MyDictionaryItemDto> dictionaryItems)
+    {
+        DictionaryItems = dictionaryItems;
+
+        Value = DictionaryItems.FirstOrDefault()?.Id;
+        await ValueChanged.InvokeAsync(Value);
+
+        EditContext.NotifyFieldChanged(FieldIdentifier);
+    }
+
+    public void SearchMyDictionaryItems(OptionsSearchEventArgs<MyDictionaryItemDto> e)
+    {
+        e.Items = MyDictionaryItemDtoFakeDatabase.GetAll()
+            .Where(i => i.Name.StartsWith(e.Text, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(i => i.Name);
+    }
+}
