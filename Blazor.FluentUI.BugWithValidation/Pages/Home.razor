@@ -3,7 +3,6 @@
 <PageTitle>Home</PageTitle>
 
 <EditForm Model="Command" OnValidSubmit="HandleValidSubmit">
-    @* <CustomValidator @ref="CustomValidator" /> *@
     <FluentValidationValidator />
 
     <XTextField @bind-Value="Command.Name" For="(() => Command.Name)" Label="Name" />
@@ -14,7 +13,6 @@
 
     <XDictionaryItemPicker @bind-Value="Command.MyDictionaryItemId" Label="MyDictionaryItem" Placeholder="Select MyDictionaryItem" />
     <FluentValidationMessage For="(() => Command.MyDictionaryItemId)" />
-
 
     <FluentButton Type="ButtonType.Submit" Color="Fluent.Color.Info">Add event</FluentButton>
 </EditForm>
